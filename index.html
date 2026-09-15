@@ -68,9 +68,25 @@
             </div>
         </div>
         
+        <!-- UI Toko -->
+        <div id="shop-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:20; flex-direction:column; justify-content:center; align-items:center;">
+            <div class="lvl-panel" style="width: 400px; text-align: center;">
+                <h2>🛒 TOKO LOBBY 🛒</h2>
+                <p>Uang Anda: <span id="shop-gold" style="color:#f1c40f; font-weight:bold;">0</span> Gold</p>
+                <div style="margin-bottom: 10px;">
+                    <button class="stat-btn" onclick="game.buyItem('hp', 50)">Beli HP Potion (50g)</button>
+                    <button class="stat-btn" onclick="game.buyItem('buff', 100)">Beli Buff Potion (100g)</button>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <button class="stat-btn" onclick="game.sellTrash()" style="background:#e67e22;">Jual Loot Biasa (<span id="shop-trash">0</span> buah x 15g)</button>
+                </div>
+                <button class="stat-btn" onclick="document.getElementById('shop-overlay').style.display='none'" style="background:#7f8c8d;">Tutup Toko</button>
+            </div>
+        </div>
+        
         <!-- Panduan Kontrol -->
         <div style="position:absolute; bottom:15px; width:100%; text-align:center; color:#bdc3c7; font-size:14px; text-shadow:1px 1px 2px black; pointer-events:none;">
-            <b>KONTROL:</b> [A/D] Gerak | [W] Lompat | <b style="color:#f1c40f;">[SPASI] Serang</b> | [Q] Ganti Senjata | [E] Masuk Portal
+            <b>KONTROL:</b> [A/D] Gerak | [W] Lompat | <b style="color:#f1c40f;">[SPASI] Serang</b> | [Q] Senjata | [E] Interaksi/Toko | [H] Heal | [J] Buff
         </div>
     </div>
     <script src="game.js"></script>
