@@ -46,6 +46,42 @@
         .stat-btn:hover { background: #3498db; }
         .xp-bar-bg { width: 100%; height: 10px; background: #555; margin-top: 5px; border-radius: 5px; }
         .xp-bar-fill { height: 100%; background: #9b59b6; width: 0%; border-radius: 5px; transition: width 0.3s; }
+        
+        /* Story UI */
+        #dialog-box {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 800px; background: rgba(0, 0, 0, 0.85); border: 3px solid #f39c12;
+            border-radius: 10px; padding: 20px; box-sizing: border-box; display: none;
+            z-index: 20; color: white; font-size: 18px; line-height: 1.5;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        #dialog-name { font-weight: bold; color: #f39c12; font-size: 22px; margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 5px; }
+        #dialog-text { min-height: 60px; }
+        #dialog-hint { text-align: right; font-size: 14px; color: #aaa; margin-top: 10px; animation: blink 1s infinite; }
+        @keyframes blink { 0% {opacity:1;} 50% {opacity:0;} 100% {opacity:1;} }
+        
+        /* Choices UI */
+        #choices-box {
+            position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%);
+            display: none; flex-direction: column; gap: 10px; z-index: 21; width: 600px;
+        }
+        .choice-btn {
+            background: #2c3e50; color: white; border: 2px solid #f39c12; padding: 15px;
+            font-size: 16px; cursor: pointer; border-radius: 5px; transition: 0.2s; text-align: left;
+        }
+        .choice-btn:hover { background: #d35400; padding-left: 25px; }
+
+        /* Shop UI */
+        #shop-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 15;
+        }
+        .shop-panel { background: #111; padding: 30px; border: 3px solid #8e44ad; border-radius: 10px; color: #ccc; width: 500px; text-align: center; }
+        .shop-item { background: #222; margin: 10px 0; padding: 10px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; border-radius: 5px;}
+        .buy-btn { background: #8e44ad; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;}
+        .buy-btn:hover { background: #9b59b6; }
+        .close-shop { margin-top: 20px; background: #c0392b; padding: 10px 20px; border: none; color: white; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -67,26 +103,31 @@
                 <button class="stat-btn" onclick="player.addStat('AGI')">Tekan [3] - AGI (+Speed & Lompat)</button>
             </div>
         </div>
-        
-        <!-- UI Toko -->
-        <div id="shop-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:20; flex-direction:column; justify-content:center; align-items:center;">
-            <div class="lvl-panel" style="width: 400px; text-align: center;">
-                <h2>🛒 TOKO LOBBY 🛒</h2>
-                <p>Uang Anda: <span id="shop-gold" style="color:#f1c40f; font-weight:bold;">0</span> Gold</p>
-                <div style="margin-bottom: 10px;">
-                    <button class="stat-btn" onclick="game.buyItem('hp', 50)">Beli HP Potion (50g)</button>
-                    <button class="stat-btn" onclick="game.buyItem('buff', 100)">Beli Buff Potion (100g)</button>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <button class="stat-btn" onclick="game.sellTrash()" style="background:#e67e22;">Jual Loot Biasa (<span id="shop-trash">0</span> buah x 15g)</button>
-                </div>
-                <button class="stat-btn" onclick="document.getElementById('shop-overlay').style.display='none'" style="background:#7f8c8d;">Tutup Toko</button>
+
+        <!-- Shop UI -->
+        <div id="shop-overlay">
+            <div class="shop-panel">
+                <h2 style="color:#8e44ad; margin-top:0;">Toko Gelap</h2>
+                <p>Ubah darah monster menjadi kekuatan...</p>
+                <h3 style="color:#f1c40f" id="shop-gold">Gold: 0</h3>
+                <div id="shop-items"></div>
+                <button class="close-shop" onclick="closeShop()">Tutup Toko</button>
             </div>
         </div>
         
+        <!-- Dialog UI -->
+        <div id="dialog-box">
+            <div id="dialog-name">Name</div>
+            <div id="dialog-text">Text</div>
+            <div id="dialog-hint">Tekan [E] untuk lanjut</div>
+        </div>
+
+        <!-- Choices UI -->
+        <div id="choices-box"></div>
+        
         <!-- Panduan Kontrol -->
-        <div style="position:absolute; bottom:15px; width:100%; text-align:center; color:#bdc3c7; font-size:14px; text-shadow:1px 1px 2px black; pointer-events:none;">
-            <b>KONTROL:</b> [A/D] Gerak | [W] Lompat | <b style="color:#f1c40f;">[SPASI] Serang</b> | [Q] Senjata | [E] Interaksi/Toko | [H] Heal | [J] Buff
+        <div style="position:absolute; bottom:5px; width:100%; text-align:center; color:#bdc3c7; font-size:12px; text-shadow:1px 1px 2px black; pointer-events:none;">
+            <b>KONTROL:</b> [A/D] Gerak | [W] Lompat | <b style="color:#f1c40f;">[SPASI] Serang</b> | [Q] Ganti Senjata | <b style="color:#3498db;">[E] Interaksi/Lanjut</b>
         </div>
     </div>
     <script src="game.js"></script>
